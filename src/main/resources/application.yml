@@ -1,0 +1,52 @@
+server:
+  port: 8084
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/seckill?useUnicode=true&characterEncoding=UTF-8&useSSL=false
+    username: root
+    password: enki
+  thymeleaf:
+    cache: false
+    servlet:
+      content-type: text/html
+    enabled: true
+    encoding: UTF-8
+    mode: HTML5
+    prefix: classpath:/templates/
+    suffix: .html
+  redis:
+    host: localhost
+    port: 6379
+    connect-timeout: 10
+
+  web:
+    resources:
+      add-mappings: true
+      chain:
+        cache: true
+        enabled: true
+      static-locations: classpath:/static/
+
+  rabbitmq:
+    host: localhost
+    username: root
+    password: root
+    port: 5672
+    virtual-host: /
+    listener:
+      simple:
+        concurrency: 10
+        max-concurrency: 10
+        prefetch: 1
+        auto-startup: true
+        default-requeue-rejected: true
+        retry:
+          enabled: true
+          initial-interval: 1000
+          max-attempts: 3
+          max-interval: 1000
+          multiplier: 1.0
+mybatis-plus:
+  config-location: classpath:mybatis/mybatis-config.xml
+  mapper-locations: mybatis/mappers/*.xml
