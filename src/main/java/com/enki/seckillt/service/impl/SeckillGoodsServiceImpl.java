@@ -22,7 +22,7 @@ public class SeckillGoodsServiceImpl extends ServiceImpl<SeckillGoodsMapper, Sec
     private GoodsMapper goodsMapper;
 
     /**
-     * 获取商品清单
+     * 获取秒杀商品清单
      *
      * @return
      */

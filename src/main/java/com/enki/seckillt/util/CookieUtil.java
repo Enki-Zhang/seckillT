@@ -16,12 +16,17 @@ public class CookieUtil {
     private final static String COOKIE_DOMAIN = "localhost";
     private final static String COOKIE_NAME = "seckill_login_token";
 
-
-    public static String readLoginToken(HttpServletRequest request){
+    /**
+     * 获取cookie中的token
+     *
+     * @param request
+     * @return
+     */
+    public static String readLoginToken(HttpServletRequest request) {
         Cookie[] cks = request.getCookies();
-        if(cks != null){
-            for(Cookie ck : cks){
-                if(StringUtils.equals(ck.getName(),COOKIE_NAME)){
+        if (cks != null) {
+            for (Cookie ck : cks) {
+                if (StringUtils.equals(ck.getName(), COOKIE_NAME)) {
                     return ck.getValue();
                 }
             }
@@ -36,8 +41,14 @@ public class CookieUtil {
     //d:A.hfbin.cn/test/dd    cookie:domain=A.hfbin.cn;path="/test/dd"
     //e:A.hfbin.cn/test       cookie:domain=A.hfbin.cn;path="/test"
 
-    public static void writeLoginToken(HttpServletResponse response, String token){
-        Cookie ck = new Cookie(COOKIE_NAME,token);
+    /**
+     * 保存登录token
+     *
+     * @param response
+     * @param token
+     */
+    public static void writeLoginToken(HttpServletResponse response, String token) {
+        Cookie ck = new Cookie(COOKIE_NAME, token);
         ck.setDomain(COOKIE_DOMAIN);
         ck.setPath("/");//代表设置在根目录
         ck.setHttpOnly(true);
@@ -47,15 +58,15 @@ public class CookieUtil {
         response.addCookie(ck);
     }
 
-    public static void delLoginToken(HttpServletRequest request, HttpServletResponse response){
+    public static void delLoginToken(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cks = request.getCookies();
-        if(cks != null){
-            for(Cookie ck : cks){
-                if(StringUtils.equals(ck.getName(),COOKIE_NAME)){
+        if (cks != null) {
+            for (Cookie ck : cks) {
+                if (StringUtils.equals(ck.getName(), COOKIE_NAME)) {
                     ck.setDomain(COOKIE_DOMAIN);
                     ck.setPath("/");
                     ck.setMaxAge(0);//设置成0，代表删除此cookie。
-                   // log.info("del cookieName:{},cookieValue:{}",ck.getName(),ck.getValue());
+                    // log.info("del cookieName:{},cookieValue:{}",ck.getName(),ck.getValue());
                     response.addCookie(ck);
                     return;
                 }

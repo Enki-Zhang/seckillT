@@ -4,8 +4,6 @@ package com.enki.seckillt.redis;
  * @Version 1.0
  */
 public interface KeyPrefix {
-		
-
 	public String getPrefix();
 	
 }

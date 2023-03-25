@@ -1,6 +1,7 @@
 package com.enki.seckillt.controller;
 
 
+import cn.hutool.core.util.StrUtil;
 import com.enki.seckillt.bo.GoodsBo;
 import com.enki.seckillt.common.Const;
 import com.enki.seckillt.entity.User;
@@ -46,29 +47,23 @@ public class GoodsController {
     @Resource
     private ThymeleafViewResolver thymeleafViewResolver;
 
-    @Resource
-    private ApplicationContext applicationContext;
 
     @RequestMapping("/list")
-    @ResponseBody
     public String list(Model model, HttpServletRequest request, HttpServletResponse response) {
-        //修改前
-       /* List<GoodsBo> goodsList = seckillGoodsService.getSeckillGoodsList();
-         model.addAttribute("goodsList", goodsList);
-    	 return "goods_list";*/
         // 缓存查询页面信息
         String html = redisService.get(GoodsKey.getGoodsList, "", String.class);
-        if (!StringUtils.isEmpty(html)) {
+        if (!StrUtil.isBlank(html)) {
             return html;
         }
-//        查询秒杀清单
+//        查询秒杀商品清单
         List<GoodsBo> goodsList = seckillGoodsService.getSeckillGoodsList();
+//        向view中添加数据
         model.addAttribute("goodsList", goodsList);
         IWebContext ctx = new WebContext(request, response,
                 request.getServletContext(), request.getLocale(), model.asMap());
         //手动渲染
         html = thymeleafViewResolver.getTemplateEngine().process("goods_list", ctx);
-        if (!StringUtils.isEmpty(html)) {
+        if (!StrUtil.isBlank(html)) {
             redisService.set(GoodsKey.getGoodsList, "", html, Const.RedisCacheExtime.GOODS_LIST);
         }
         return html;
@@ -118,17 +113,30 @@ public class GoodsController {
         }
     }
 
+    /**
+     * 秒杀详情页
+     *
+     * @param model
+     * @param goodsId
+     * @param request
+     * @return
+     */
     @RequestMapping("/detail/{goodsId}")
     @ResponseBody
     public Result<GoodsDetailVo> detail(Model model,
                                         @PathVariable("goodsId") long goodsId, HttpServletRequest request) {
         String loginToken = CookieUtil.readLoginToken(request);
+//        查询redis中的token
         User user = redisService.get(UserKey.getByName, loginToken, User.class);
-
+//根据id查询秒杀商品
         GoodsBo goods = seckillGoodsService.getseckillGoodsBoByGoodsId(goodsId);
         if (goods == null) {
+//            商品不存在
             return Result.error(CodeMsg.NO_GOODS);
         } else {
+            if (goods.getStockCount() < 1) {
+                return Result.error(CodeMsg.INSUFFICIENT_INVENTORY);
+            }
             model.addAttribute("goods", goods);
             long startAt = goods.getStartDate().getTime();
             long endAt = goods.getEndDate().getTime();
@@ -144,6 +152,7 @@ public class GoodsController {
             } else {//秒杀进行中
                 miaoshaStatus = 1;
             }
+//            包装商品信息
             GoodsDetailVo vo = new GoodsDetailVo();
             vo.setGoods(goods);
             vo.setUser(user);

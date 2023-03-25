@@ -28,6 +28,10 @@ public interface GoodsMapper extends BaseMapper<Goods> {
 
     int updateByPrimaryKey(Goods record);
 
+    /**
+     * 获取秒杀商品 多表联查
+     * @return
+     */
     List<GoodsBo> selectAllGoodes();
 
     GoodsBo getseckillGoodsBoByGoodsId(long goodsId);

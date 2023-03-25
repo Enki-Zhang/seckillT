@@ -1,5 +1,6 @@
 package com.enki.seckillt.redis;
 /**
+ * redis userKey前缀
  * @author Enki
  * @Version 1.0
  */

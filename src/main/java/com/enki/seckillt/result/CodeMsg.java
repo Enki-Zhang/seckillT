@@ -26,6 +26,7 @@ public class CodeMsg {
 	public static CodeMsg USER_NO_LOGIN = new CodeMsg(500216, "用户未登录");
 	//商品模块 5003XX
 	public static CodeMsg NO_GOODS = new CodeMsg(500100, "没有该商品");
+	public static CodeMsg INSUFFICIENT_INVENTORY = new CodeMsg(500100, "库存不足");
 	//订单模块 5004XX
 	public static CodeMsg ORDER_NOT_EXIST = new CodeMsg(500400, "订单不存在");
 	//秒杀模块 5005XX

@@ -50,3 +50,6 @@ spring:
 mybatis-plus:
   config-location: classpath:mybatis/mybatis-config.xml
   mapper-locations: mybatis/mappers/*.xml
+logging:
+  level:
+    com.enki.seckillt: debug

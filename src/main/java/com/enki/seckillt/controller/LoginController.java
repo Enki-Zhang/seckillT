@@ -18,6 +18,8 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 /**
+ * 登录
+ *
  * @author Enki
  * @Version 1.0
  */
@@ -33,6 +35,7 @@ public class LoginController {
 
     /**
      * 用户登录
+     *
      * @param response
      * @param session
      * @param loginParam
@@ -40,10 +43,10 @@ public class LoginController {
      */
     @RequestMapping("/login")
     public Result<User> doLogin(HttpServletResponse response, HttpSession session, LoginParam loginParam) {
-//        log.info("用户表单{}",loginParam);
         Result<User> login = userService.login(loginParam);
         if (login.isSuccess()) {
             CookieUtil.writeLoginToken(response, session.getId());
+//            保存用户信息
             redisService.set(UserKey.getByName, session.getId(), login.getData(), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
         }
         return login;

@@ -63,7 +63,7 @@ public class SeckillController implements InitializingBean {
      */
     public void afterPropertiesSet() throws Exception {
         log.info("我在启动。。。。。。。。。");
-//        初始化商品信息 从goodsService中
+//        初始化商品信息
         List<GoodsBo> goodsList = seckillGoodsService.getSeckillGoodsList();
         if (goodsList == null) {
             return;
@@ -77,7 +77,6 @@ public class SeckillController implements InitializingBean {
     @RequestMapping("/seckill2")
     public String list2(Model model,
                         @RequestParam("goodsId") long goodsId, HttpServletRequest request) {
-
         String loginToken = CookieUtil.readLoginToken(request);
         User user = redisService.get(UserKey.getByName, loginToken, User.class);
         model.addAttribute("user", user);
@@ -104,8 +103,17 @@ public class SeckillController implements InitializingBean {
         return "order_detail";
     }
 
-    @RequestMapping(value = "/{path}/seckill", method = RequestMethod.POST)
-    @ResponseBody
+    /**
+     * 秒杀
+     *
+     * @param model
+     * @param goodsId 路径中的变量
+     * @param path    请求中的变量
+     * @param request
+     * @return
+     */
+    @PostMapping("/{path}/seckill")
+//    @ResponseBody
     public Result<Integer> list(Model model,
                                 @RequestParam("goodsId") long goodsId,
                                 @PathVariable("path") String path,
@@ -163,8 +171,16 @@ public class SeckillController implements InitializingBean {
         return Result.success(result);
     }
 
+    /**
+     * 秒杀路径创建 同时会将路径传给前端
+     *
+     * @param request
+     * @param user
+     * @param goodsId
+     * @return
+     */
     @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
-    @RequestMapping(value = "/path", method = RequestMethod.GET)
+    @GetMapping("/path")
     @ResponseBody
     public Result<String> getMiaoshaPath(HttpServletRequest request, User user,
                                          @RequestParam("goodsId") long goodsId) {

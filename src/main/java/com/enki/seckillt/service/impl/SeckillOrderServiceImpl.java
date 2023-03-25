@@ -102,6 +102,13 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
         }
     }
 
+    /**
+     * 验证路径
+     * @param user
+     * @param goodsId
+     * @param path
+     * @return
+     */
     public boolean checkPath(User user, long goodsId, String path) {
         if (user == null || path == null) {
             return false;
@@ -114,6 +121,7 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
         if (user == null || goodsId <= 0) {
             return null;
         }
+//        加密路径
         String str = MD5Util.md5(UUID.randomUUID() + "123456");
         redisService.set(SeckillKey.getSeckillPath, "" + user.getId() + "_" + goodsId, str, Const.RedisCacheExtime.GOODS_ID);
         return str;
