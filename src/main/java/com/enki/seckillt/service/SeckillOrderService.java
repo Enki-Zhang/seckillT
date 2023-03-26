@@ -13,10 +13,9 @@ import com.enki.seckillt.entity.User;
  */
 public interface SeckillOrderService extends IService<SeckillOrder> {
 
-    SeckillOrder getSeckillOrderByUserIdGoodsId(long userId , long goodsId);
+    SeckillOrder getSeckillOrderByUserIdGoodsId(long userId, long goodsId);
 
-
-    OrderInfo insert(User user , GoodsBo goodsBo);
+    OrderInfo insert(User user, GoodsBo goodsBo);
 
     OrderInfo getOrderInfo(long orderId);
 

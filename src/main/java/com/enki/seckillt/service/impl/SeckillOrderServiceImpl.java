@@ -2,6 +2,7 @@ package com.enki.seckillt.service.impl;
 
 
 import cn.hutool.core.lang.UUID;
+import com.baomidou.mybatisplus.extension.conditions.query.QueryChainWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.enki.seckillt.bo.GoodsBo;
 import com.enki.seckillt.common.Const;
@@ -48,7 +49,8 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
 
     @Override
     public SeckillOrder getSeckillOrderByUserIdGoodsId(long userId, long goodsId) {
-        return seckillOrderMapper.selectByUserIdAndGoodsId(userId, goodsId);
+       return query().eq("user_id", userId).eq("goods_id", goodsId).one();
+//        return seckillOrderMapper.selectByUserIdAndGoodsId(userId, goodsId);
     }
 
     @Transactional
@@ -88,7 +90,8 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
 
     @Override
     public OrderInfo getOrderInfo(long orderId) {
-        SeckillOrder seckillOrder = seckillOrderMapper.selectByPrimaryKey(orderId);
+//        根据订单信息 查询订单
+        SeckillOrder seckillOrder  = query().eq("order_id", orderId).one();
         if (seckillOrder == null) {
             return null;
         }
@@ -103,7 +106,8 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
      * @return
      */
     public long getSeckillResult(Long userId, long goodsId) {
-        SeckillOrder order = getSeckillOrderByUserIdGoodsId(userId, goodsId);
+        SeckillOrder order = query().eq("user_id", userId).eq("goods_id", goodsId).one();
+//        SeckillOrder order = getSeckillOrderByUserIdGoodsId(userId, goodsId);
         if (order != null) {//秒杀成功
             return order.getOrderId();
         } else {
