@@ -37,16 +37,15 @@ public class SeckillOrderController {
 
     @RequestMapping("/detail")
     @ResponseBody
-    public Result<OrderDetailVo> info(Model model,
-                                      @RequestParam("orderId") long orderId , HttpServletRequest request) {
+    public Result<OrderDetailVo> info(@RequestParam("orderId") long orderId, HttpServletRequest request) {
         String loginToken = CookieUtil.readLoginToken(request);
         User user = redisService.get(UserKey.getByName, loginToken, User.class);
-        if(user == null) {
+        if (user == null) {
             return Result.error(CodeMsg.USER_NO_LOGIN);
         }
         // TODO: 可自行扩展缓存中获取，请勿吐槽，此教程只是为了让大家知道整个流程，细节东西自行拓展
         OrderInfo order = seckillOrderService.getOrderInfo(orderId);
-        if(order == null) {
+        if (order == null) {
             return Result.error(CodeMsg.ORDER_NOT_EXIST);
         }
         long goodsId = order.getGoodsId();

@@ -69,8 +69,11 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
             orderInfo.setUserId((long) user.getId());
             //添加信息进订单
             long orderId = orderService.addOrder(orderInfo);
+            RedisID redisID = new RedisID(stringRedisTemplate);
+            long seckillID = redisID.nextId("orderId");
             log.info("orderId -->" + orderId + "");
             SeckillOrder seckillOrder = new SeckillOrder();
+            seckillOrder.setId(seckillID);
             seckillOrder.setGoodsId(goods.getId());
             seckillOrder.setOrderId(orderInfo.getId());
             seckillOrder.setUserId((long) user.getId());

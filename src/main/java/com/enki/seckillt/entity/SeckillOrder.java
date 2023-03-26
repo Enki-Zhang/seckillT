@@ -20,4 +20,5 @@ public class SeckillOrder {
 
     private Long goodsId;
 
+
 }
