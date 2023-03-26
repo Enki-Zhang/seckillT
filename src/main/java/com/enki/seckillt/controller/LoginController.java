@@ -40,45 +40,21 @@ public class LoginController {
      * 用户登录
      * 将token保存在session中根据cookie中的sessionId访问token
      *
-     * @param response
      * @param session
      * @param loginParam 登录表单信息
      * @return
      */
     @PostMapping("/login")
-    public Result<User> doLogin(HttpServletResponse response, HttpServletRequest request, HttpSession session, LoginParam loginParam) {
+    public Result<User> doLogin(HttpServletRequest request, HttpSession session, LoginParam loginParam) {
         Result<User> login = userService.login(loginParam);
-//        登录成功创建sessionid存入cookie中
+//        登录成功 保存token到redis中
         if (login.isSuccess()) {
-            String token = UUID.randomUUID().toString(true);
-//            写入token到session中
-            session.setAttribute("loginToken", token);
-//            log.info("token保存{}",session.getAttribute("login"));
-//            HttpSession session1 = request.getSession();
-//            String login1 =(String) session1.getAttribute("login");
-//            log.info("session1中的{}",login1);
-
-//            request.getSession().setAttribute("login",token);
-//            CookieUtil.writeLoginToken(response, session.getId());
-//            redis保存用户session value为用户登录信息
-//            redisService.set(UserKey.getByName, session.getId(), login.getData(), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
+            CookieUtil.writeLoginToken(session);
+            String token = CookieUtil.readLoginToken(request);
 //            token 保存在redis中
             redisService.set(UserKey.getByName, token, login.getData(), Const.RedisCacheExtime.REDIS_SESSION_EXTIME);
         }
         return login;
-    }
-
-    /**
-     * 登录设置
-     *
-     * @param request
-     * @param loginParam
-     * @return
-     */
-    @PostMapping("/login2")
-    public Result<User> login(HttpServletRequest request, LoginParam loginParam) {
-        return userService.login2(request, loginParam);
-
     }
 
     @RequestMapping("/logout")

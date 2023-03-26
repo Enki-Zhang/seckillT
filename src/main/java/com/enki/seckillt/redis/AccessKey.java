@@ -1,5 +1,6 @@
 package com.enki.seckillt.redis;
 /**
+ * 秒杀权限
  * @author Enki
  * @Version 1.0
  */

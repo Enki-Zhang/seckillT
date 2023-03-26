@@ -2,6 +2,7 @@ package com.enki.seckillt.controller;
 
 
 import com.enki.seckillt.annotations.AccessLimit;
+import com.enki.seckillt.annotations.Limit;
 import com.enki.seckillt.bo.GoodsBo;
 import com.enki.seckillt.common.Const;
 import com.enki.seckillt.entity.OrderInfo;
@@ -44,8 +45,6 @@ public class SeckillController implements InitializingBean {
 
     @Autowired
     private SeckillGoodsService seckillGoodsService;
-    @Autowired
-    private GoodsService goodsService;
 
     @Resource
     private SeckillOrderService seckillOrderService;
@@ -62,7 +61,7 @@ public class SeckillController implements InitializingBean {
      * 将库存初始化到本地缓存及redis缓存，原则上次块应该在创建秒杀活动时候触发的（为了演示，此项目没有创建活动逻辑，所有放在启动项目时候放进内存）
      */
     public void afterPropertiesSet() throws Exception {
-        log.info("我在启动。。。。。。。。。");
+        log.info("我在初始化商品信息。。。。。。。。。");
 //        初始化商品信息
         List<GoodsBo> goodsList = seckillGoodsService.getSeckillGoodsList();
         if (goodsList == null) {
@@ -106,14 +105,12 @@ public class SeckillController implements InitializingBean {
     /**
      * 秒杀
      *
-     * @param model
      * @param goodsId 路径中的变量
      * @param path    请求中的变量
      * @param request
      * @return
      */
     @PostMapping("/{path}/seckill")
-//    @ResponseBody
     public Result<Integer> list(
             @RequestParam("goodsId") long goodsId,
             @PathVariable("path") String path,
@@ -180,6 +177,7 @@ public class SeckillController implements InitializingBean {
      * @return
      */
     @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
+//    @Limit(key = "接口限流", prefix = "sec", period = 10, count = 3)
     @GetMapping("/path")
     @ResponseBody
     public Result<String> getMiaoshaPath(HttpServletRequest request, User user,
@@ -189,6 +187,7 @@ public class SeckillController implements InitializingBean {
         if (user == null) {
             return Result.error(CodeMsg.USER_NO_LOGIN);
         }
+//        创建秒杀路径
         String path = seckillOrderService.createMiaoshaPath(user, goodsId);
         return Result.success(path);
     }

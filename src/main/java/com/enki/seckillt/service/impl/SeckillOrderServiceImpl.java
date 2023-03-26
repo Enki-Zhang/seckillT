@@ -9,6 +9,7 @@ import com.enki.seckillt.entity.OrderInfo;
 import com.enki.seckillt.entity.SeckillOrder;
 import com.enki.seckillt.entity.User;
 import com.enki.seckillt.mapper.SeckillOrderMapper;
+import com.enki.seckillt.redis.RedisID;
 import com.enki.seckillt.redis.RedisService;
 import com.enki.seckillt.redis.SeckillKey;
 import com.enki.seckillt.service.OrderService;
@@ -17,6 +18,7 @@ import com.enki.seckillt.service.SeckillOrderService;
 import com.enki.seckillt.util.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +40,8 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
 
     @Autowired
     RedisService redisService;
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     @Autowired
     OrderService orderService;
@@ -88,6 +92,13 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
         return orderService.getOrderInfo(seckillOrder.getOrderId());
     }
 
+    /**
+     * 秒杀成功
+     *
+     * @param userId
+     * @param goodsId
+     * @return
+     */
     public long getSeckillResult(Long userId, long goodsId) {
         SeckillOrder order = getSeckillOrderByUserIdGoodsId(userId, goodsId);
         if (order != null) {//秒杀成功
@@ -104,6 +115,7 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
 
     /**
      * 验证路径
+     *
      * @param user
      * @param goodsId
      * @param path
@@ -117,15 +129,27 @@ public class SeckillOrderServiceImpl extends ServiceImpl<SeckillOrderMapper, Sec
         return path.equals(pathOld);
     }
 
+    /**
+     * 创建秒杀路径
+     *
+     * @param user
+     * @param goodsId
+     * @return
+     */
     public String createMiaoshaPath(User user, long goodsId) {
         if (user == null || goodsId <= 0) {
             return null;
         }
 //        加密路径
-        String str = MD5Util.md5(UUID.randomUUID() + "123456");
-        redisService.set(SeckillKey.getSeckillPath, "" + user.getId() + "_" + goodsId, str, Const.RedisCacheExtime.GOODS_ID);
-        return str;
+//        全局唯一
+        RedisID redisID = new RedisID(stringRedisTemplate);
+        String path = redisID.nextId(SeckillKey.getSeckillPath.getPrefix())+ "";
+        log.info("秒杀路径{}",path);
+//        String str = MD5Util.md5(UUID.randomUUID() + "123456");
+        redisService.set(SeckillKey.getSeckillPath, "" + user.getId() + "_" + goodsId, path, Const.RedisCacheExtime.GOODS_ID);
+        return path;
     }
+
 
     /*
      * 秒杀商品结束标记

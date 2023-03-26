@@ -49,7 +49,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 //        if (entries != null) {
 //            return Result.success(user);
 //        }
-
         User user = query().eq("phone", phone).one();
         if (user == null) {
             return Result.error(CodeMsg.MOBILE_NOT_EXIST);

@@ -1,5 +1,6 @@
 package com.enki.seckillt.util;
 
+import cn.hutool.core.lang.UUID;
 import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -19,15 +20,15 @@ public class CookieUtil {
     private final static String COOKIE_NAME = "seckill_login_token";
 
     /**
-     * 获取cookie中的token
+     * 获取session中的token
      *
      * @param request
      * @return
      */
     public static String readLoginToken(HttpServletRequest request) {
         HttpSession session = request.getSession();
-        String loginToken =(String) session.getAttribute("loginToken");
-        log.info("session{}", loginToken);
+        String loginToken = (String) session.getAttribute("loginToken");
+//        log.info("session{}", loginToken);
         if (!StrUtil.isBlank(loginToken)) {
             return loginToken;
         }
@@ -47,17 +48,33 @@ public class CookieUtil {
      * @param response
      * @param token
      */
-    public static void writeLoginToken(HttpServletResponse response, String token) {
+//    public static void writeLoginToken(HttpServletResponse response, String token) {
+//
+//        String token = UUID.randomUUID().toString(true);
+////            写入token到session中
+//        session.setAttribute("loginToken", token);
+//
+//        Cookie ck = new Cookie(COOKIE_NAME, token);
+//        ck.setDomain(COOKIE_DOMAIN);
+//        ck.setPath("/");//代表设置在根目录
+//        ck.setHttpOnly(true);
+//        //单位是秒。
+//        //如果这个maxage不设置的话，cookie就不会写入硬盘，而是写在内存。只在当前页面有效。
+//        ck.setMaxAge(60 * 60 * 24 * 365);//如果是-1，代表永久
+//        response.addCookie(ck);
+//    }
 
-        Cookie ck = new Cookie(COOKIE_NAME, token);
-        ck.setDomain(COOKIE_DOMAIN);
-        ck.setPath("/");//代表设置在根目录
-        ck.setHttpOnly(true);
-        //单位是秒。
-        //如果这个maxage不设置的话，cookie就不会写入硬盘，而是写在内存。只在当前页面有效。
-        ck.setMaxAge(60 * 60 * 24 * 365);//如果是-1，代表永久
-        response.addCookie(ck);
+    /**
+     * 向session写入token
+     *
+     * @param session
+     */
+    public static void writeLoginToken(HttpSession session) {
+        String token = UUID.randomUUID().toString(true);
+//            写入token到session中
+        session.setAttribute("loginToken", token);
     }
+
 
     public static void delLoginToken(HttpServletRequest request, HttpServletResponse response) {
         Cookie[] cks = request.getCookies();

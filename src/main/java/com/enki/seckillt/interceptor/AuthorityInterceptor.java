@@ -63,7 +63,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
                 requestParamBuffer.append(mapKey).append("=").append(mapValue);
             }
 
-            //接口限流
+            //接口限流  得到AccessLimit注解的实例
             AccessLimit accessLimit = handlerMethod.getMethodAnnotation(AccessLimit.class);
             if (accessLimit == null) {
                 return true;
@@ -71,6 +71,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
             int seconds = accessLimit.seconds();
             int maxCount = accessLimit.maxCount();
             boolean needLogin = accessLimit.needLogin();
+//            获取请求地址
             String key = request.getRequestURI();
 
 
@@ -87,7 +88,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
             if (StringUtils.isNotEmpty(loginToken)) {
                 user = redisService.get(UserKey.getByName, loginToken, User.class);
             }
-
+//用户未登录
             if (needLogin) {
                 if (user == null) {
                     render(response, CodeMsg.USER_NO_LOGIN);
