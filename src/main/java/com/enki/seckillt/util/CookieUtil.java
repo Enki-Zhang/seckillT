@@ -1,11 +1,13 @@
 package com.enki.seckillt.util;
 
+import cn.hutool.core.util.StrUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  * @author Enki
@@ -24,13 +26,21 @@ public class CookieUtil {
      */
     public static String readLoginToken(HttpServletRequest request) {
         Cookie[] cks = request.getCookies();
-        if (cks != null) {
-            for (Cookie ck : cks) {
-                if (StringUtils.equals(ck.getName(), COOKIE_NAME)) {
-                    return ck.getValue();
-                }
-            }
+        HttpSession session = request.getSession();
+        log.info("session{}", session.getId());
+        String id = session.getId();
+        if (!StrUtil.isBlank(id)) {
+            return id;
         }
+//        if (cks != null) {
+//            for (Cookie ck : cks) {
+//                if (StringUtils.equals(ck.getName(), COOKIE_NAME)) {
+//                    log.info("cookie{}",ck.getValue());
+//                    return ck.getValue();
+//                }
+//            }
+//        }
+
         return null;
     }
 
@@ -42,12 +52,13 @@ public class CookieUtil {
     //e:A.hfbin.cn/test       cookie:domain=A.hfbin.cn;path="/test"
 
     /**
-     * 保存登录token
+     * 保存登录sessionID
      *
      * @param response
      * @param token
      */
     public static void writeLoginToken(HttpServletResponse response, String token) {
+
         Cookie ck = new Cookie(COOKIE_NAME, token);
         ck.setDomain(COOKIE_DOMAIN);
         ck.setPath("/");//代表设置在根目录

@@ -114,10 +114,10 @@ public class SeckillController implements InitializingBean {
      */
     @PostMapping("/{path}/seckill")
 //    @ResponseBody
-    public Result<Integer> list(Model model,
-                                @RequestParam("goodsId") long goodsId,
-                                @PathVariable("path") String path,
-                                HttpServletRequest request) {
+    public Result<Integer> list(
+            @RequestParam("goodsId") long goodsId,
+            @PathVariable("path") String path,
+            HttpServletRequest request) {
 
         String loginToken = CookieUtil.readLoginToken(request);
         User user = redisService.get(UserKey.getByName, loginToken, User.class);

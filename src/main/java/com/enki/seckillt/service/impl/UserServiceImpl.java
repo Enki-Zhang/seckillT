@@ -2,10 +2,13 @@ package com.enki.seckillt.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.bean.copier.CopyOptions;
+import cn.hutool.core.lang.UUID;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.enki.seckillt.entity.User;
 import com.enki.seckillt.mapper.UserMapper;
 import com.enki.seckillt.param.LoginParam;
+import com.enki.seckillt.redis.UserKey;
 import com.enki.seckillt.result.CodeMsg;
 import com.enki.seckillt.result.Result;
 import com.enki.seckillt.service.UserService;
@@ -16,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -65,5 +69,29 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         stringRedisTemplate.expire(phone, 30L, TimeUnit.MINUTES);
         user.setPassword(StringUtils.EMPTY);
         return Result.success(user);
+    }
+
+    /**
+     * 登录
+     * @param request
+     * @param loginParam
+     * @return
+     */
+    @Override
+    public Result<User> login2(HttpServletRequest request, LoginParam loginParam) {
+        String mobile = loginParam.getMobile();
+        User user = query().eq("phone", mobile).one();
+        String salt = user.getSalt();
+//        String calcPass = MD5Util.formPassToDBPass(loginParam.getPassword(), saltDB);
+        String finPW = MD5Util.formPassToDBPass(loginParam.getPassword(), salt);
+        if (!StrUtil.equals(finPW,loginParam.getPassword())){
+            return Result.error(CodeMsg.PASSWORD_EMPTY);
+        }
+//        保存用户
+//        String userID = UUID.randomUUID().toString(true);
+//        String token =
+
+
+        return null;
     }
 }

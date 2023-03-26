@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * redis工具类
+ *
  * @author Enki
  * @Version 1.0
  */
@@ -18,7 +20,12 @@ public class RedisService {
     private RedisTemplate<String, Object> redisTemplate;
 
     /**
-     * 获取当个对象
+     * 获取对象
+     * @param prefix
+     * @param key
+     * @param c
+     * @param <T>
+     * @return
      */
     public <T> T get(KeyPrefix prefix, String key, Class c) {
         //生成真正的key

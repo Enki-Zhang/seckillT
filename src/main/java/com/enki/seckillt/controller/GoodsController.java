@@ -126,6 +126,9 @@ public class GoodsController {
     public Result<GoodsDetailVo> detail(Model model,
                                         @PathVariable("goodsId") long goodsId, HttpServletRequest request) {
         String loginToken = CookieUtil.readLoginToken(request);
+        String sessionId = request.getSession().getId();
+
+
 //        查询redis中的token
         User user = redisService.get(UserKey.getByName, loginToken, User.class);
 //根据id查询秒杀商品
