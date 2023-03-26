@@ -25,22 +25,12 @@ public class CookieUtil {
      * @return
      */
     public static String readLoginToken(HttpServletRequest request) {
-        Cookie[] cks = request.getCookies();
         HttpSession session = request.getSession();
-        log.info("session{}", session.getId());
-        String id = session.getId();
-        if (!StrUtil.isBlank(id)) {
-            return id;
+        String loginToken =(String) session.getAttribute("loginToken");
+        log.info("session{}", loginToken);
+        if (!StrUtil.isBlank(loginToken)) {
+            return loginToken;
         }
-//        if (cks != null) {
-//            for (Cookie ck : cks) {
-//                if (StringUtils.equals(ck.getName(), COOKIE_NAME)) {
-//                    log.info("cookie{}",ck.getValue());
-//                    return ck.getValue();
-//                }
-//            }
-//        }
-
         return null;
     }
 
