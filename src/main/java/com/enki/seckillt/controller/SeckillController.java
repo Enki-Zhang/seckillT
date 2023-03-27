@@ -3,6 +3,7 @@ package com.enki.seckillt.controller;
 
 import com.enki.seckillt.annotations.AccessLimit;
 import com.enki.seckillt.annotations.Limit;
+import com.enki.seckillt.annotations.RateLimitAspect;
 import com.enki.seckillt.bo.GoodsBo;
 import com.enki.seckillt.common.Const;
 import com.enki.seckillt.entity.OrderInfo;
@@ -125,7 +126,7 @@ public class SeckillController implements InitializingBean {
         if (!check) {
             return Result.error(CodeMsg.REQUEST_ILLEGAL);
         }
-        //内存标记，减少redis访问
+        //内存标记，减少redis访问 检查是否秒杀结束
         boolean over = localOverMap.get(goodsId);
         if (over) {
             return Result.error(CodeMsg.MIAO_SHA_OVER);
@@ -134,18 +135,21 @@ public class SeckillController implements InitializingBean {
         long stock = redisService.decr(GoodsKey.getSeckillGoodsStock, String.valueOf(goodsId));
         if (stock < 0) {
             localOverMap.put(goodsId, true);
+//            库存补充 保证数据一致性
+            redisService.incr(GoodsKey.getSeckillGoodsStock,""+goodsId);
             return Result.error(CodeMsg.MIAO_SHA_OVER);
         }
-        //判断是否已经秒杀到了
+        //判断是否已经秒杀到了 避免一个账户秒杀多个商品
         SeckillOrder order = seckillOrderService.getSeckillOrderByUserIdGoodsId(user.getId(), goodsId);
         if (order != null) {
             return Result.error(CodeMsg.REPEATE_MIAOSHA);
         }
-        //入队
+        //正常请求，入队，发送一个秒杀message到队列里面去，入队之后客户端应该进行轮询。
         SeckillMessage mm = new SeckillMessage();
         mm.setUser(user);
         mm.setGoodsId(goodsId);
         mqSender.sendSeckillMessage(mm);
+        //返回0代表排队中
         return Result.success(0);
     }
 
@@ -175,7 +179,8 @@ public class SeckillController implements InitializingBean {
      * @param goodsId
      * @return
      */
-    @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
+//    @AccessLimit(seconds = 5, maxCount = 5, needLogin = true)
+    @RateLimitAspect
 //    @Limit(key = "接口限流", prefix = "sec", period = 10, count = 3)
     @GetMapping("/path")
     @ResponseBody

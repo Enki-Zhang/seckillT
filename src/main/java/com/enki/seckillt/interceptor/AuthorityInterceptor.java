@@ -27,6 +27,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 /**
+ * 限流拦截器
+ *
  * @author Enki
  * @Version 1.0
  */
@@ -62,7 +64,7 @@ public class AuthorityInterceptor implements HandlerInterceptor {
                 }
                 requestParamBuffer.append(mapKey).append("=").append(mapValue);
             }
-
+//查看接口方法是否有限流注解
             //接口限流  得到AccessLimit注解的实例
             AccessLimit accessLimit = handlerMethod.getMethodAnnotation(AccessLimit.class);
             if (accessLimit == null) {
@@ -94,12 +96,14 @@ public class AuthorityInterceptor implements HandlerInterceptor {
                     render(response, CodeMsg.USER_NO_LOGIN);
                     return false;
                 }
+//                用户存在拼接redis中的key
                 key += "_" + user.getId();
             } else {
                 //do nothing
             }
             AccessKey ak = AccessKey.withExpire;
             Integer count = redisService.get(ak, key, Integer.class);
+//            redis 中key存在 查看是否达到最大请求数目
             if (count == null) {
                 redisService.set(ak, key, 1, seconds);
             } else if (count < maxCount) {
